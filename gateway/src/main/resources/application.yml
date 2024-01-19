@@ -1,0 +1,84 @@
+server:
+  port: 8088
+
+---
+
+spring:
+  profiles: default
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8090/.well-known/jwks.json
+  cloud:
+    gateway:
+      routes:
+         - id: front
+           uri: http://localhost:8082
+           predicates:
+            - Path=/orders/** /chooseMenus/**/readOrderStates/**
+         - id: store
+           uri: http://localhost:8083
+           predicates:
+            - Path=/orders/** 
+         - id: rider
+           uri: http://localhost:8084
+           predicates:
+            - Path=/foodDeliveries/** 
+         - id: customer
+           uri: http://localhost:8085
+           predicates:
+            - Path=//** /readOrderStates/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+
+---
+
+spring:
+  profiles: docker
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://oauth:8080/.well-known/jwks.json
+  cloud:
+    gateway:
+      routes:
+        - id: front
+          uri: http://front:8080
+          predicates:
+            - Path=/orders/** /chooseMenus/**/readOrderStates/**
+        - id: store
+          uri: http://store:8080
+          predicates:
+            - Path=/orders/** 
+        - id: rider
+          uri: http://rider:8080
+          predicates:
+            - Path=/foodDeliveries/** 
+        - id: customer
+          uri: http://customer:8080
+          predicates:
+            - Path=//** /readOrderStates/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+server:
+  port: 8080
